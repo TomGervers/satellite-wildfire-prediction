@@ -80,7 +80,7 @@ model_checkpoint = ModelCheckpoint('best_model.keras', save_best_only=True)
 
 history = model.fit(
     train_generator,
-    epochs=1,                           # Number of training epochs
+    epochs=10,                           # Number of training epochs
     validation_data=validation_generator,
     callbacks=[early_stopping, model_checkpoint],
 )
