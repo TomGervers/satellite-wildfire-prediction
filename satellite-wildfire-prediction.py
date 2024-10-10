@@ -1,11 +1,11 @@
 import tensorflow as tf
 import keras
 from keras import layers
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 from PIL import Image, ImageFile
-import scipy
-import os
+import matplotlib.pyplot as plt
 
 model = keras.Sequential(
     [
@@ -50,11 +50,8 @@ train_datagen = ImageDataGenerator(
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
-# Create a generator with rescaling
-datagen = ImageDataGenerator(rescale=1./255)
-
 # Directory containing images
-train_generator = datagen.flow_from_directory(
+train_generator = train_datagen.flow_from_directory(
     'C:/Users/tomge/Desktop/Python code/datasets/wildfire-satellite/train',
     target_size=(128, 128),
     batch_size=32,
@@ -69,16 +66,42 @@ validation_generator = test_datagen.flow_from_directory(
     class_mode='binary'
 )
 
+test_generator = test_datagen.flow_from_directory(
+    'C:/Users/tomge/Desktop/Python code/datasets/wildfire-satellite/test',            # Path to the test/validation data
+    target_size=(128, 128),    # Resize images to 128x128
+    batch_size=32,
+    class_mode='binary'
+)
+
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+model_checkpoint = ModelCheckpoint('best_model.keras', save_best_only=True)
 
 history = model.fit(
     train_generator,
-    epochs=5,                           # Number of training epochs
+    epochs=1,                           # Number of training epochs
     validation_data=validation_generator,
+    callbacks=[early_stopping, model_checkpoint],
 )
 
 # Evaluate the model on the test set
-test_loss, test_acc = model.evaluate(validation_generator, steps=validation_generator.samples // validation_generator.batch_size)
+test_loss, test_acc = model.evaluate(test_generator)
 
 print(f'Test accuracy: {test_acc * 100:.2f}%')
-model.save('forest_fire_model.h5')
+model.save('forest_fire_model.keras')
+
+
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
+
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
