@@ -52,7 +52,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 # Directory containing images
 train_generator = train_datagen.flow_from_directory(
-    'C:/Users/tomge/Desktop/Python code/datasets/wildfire-satellite/train',
+    'data/train',
     target_size=(128, 128),
     batch_size=32,
     class_mode='binary'
@@ -60,14 +60,14 @@ train_generator = train_datagen.flow_from_directory(
 
 
 validation_generator = test_datagen.flow_from_directory(
-    'C:/Users/tomge/Desktop/Python code/datasets/wildfire-satellite/valid',            # Path to the test/validation data
+    'data/valid',            # Path to the test/validation data
     target_size=(128, 128),    # Resize images to 128x128
     batch_size=32,
     class_mode='binary'
 )
 
 test_generator = test_datagen.flow_from_directory(
-    'C:/Users/tomge/Desktop/Python code/datasets/wildfire-satellite/test',            # Path to the test/validation data
+    'data/test',            # Path to the test/validation data
     target_size=(128, 128),    # Resize images to 128x128
     batch_size=32,
     class_mode='binary'
